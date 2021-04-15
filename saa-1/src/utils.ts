@@ -1,0 +1,1 @@
+export const sum = (data: number[]) => data.reduce((a, b) => a + b, 0)
