@@ -12,12 +12,13 @@ import {
 import "./App.css";
 import { Line } from "react-chartjs-2";
 import { wma, ema } from "./averages.ts";
+import { getOzoneDataset } from "./datasets/ozone";
+import { getSunspotsDataset } from "./datasets/sunspots";
+import { getLondonTempDataset } from "./datasets/london-temp";
+import { getPhilPrecipDataset } from "./datasets/philadelphia-percip";
+import { getMaunaLoaCo2 } from "./datasets/mauna-loa-co2";
 
-const data = Array(1000)
-  .fill(0)
-  .map((x) => Math.random() * 1000);
-
-const getPrimaryData = ({
+const getChartData = (dataset) => ({
   K,
   L,
   alfa,
@@ -25,49 +26,62 @@ const getPrimaryData = ({
   emaVisible,
   unprocessedDataVisible,
 }) => ({
-  labels: data.map((_, idx) => idx.toString()),
-  datasets: [
-    unprocessedDataVisible && {
-      label: "Pradiniai duomenys",
-      data: data,
-      fill: false,
-      backgroundColor: "rgb(0, 0, 0)",
-      borderColor: "rgba(0, 0, 0, 0.2)",
-    },
-    wmaVisible && {
-      label: "Slenkantis vidurkis su svoriais",
-      data: wma(data, K, L),
-      fill: false,
-      backgroundColor: "rgb(255, 0, 0)",
-      borderColor: "rgba(255, 0, 0, 0.5)",
-    },
-    emaVisible && {
-      label: "Eksponentinis slenkantis vidurkis",
-      data: ema(data, alfa),
-      fill: false,
-      backgroundColor: "rgb(25, 99, 132)",
-      borderColor: "rgba(25, 99, 132, 0.2)",
-    },
-  ].filter((x) => x),
-});
-
-const options = {
-  scales: {
-    yAxes: [
-      {
-        ticks: {
-          beginAtZero: true,
-        },
+  data: {
+    labels: dataset.labels,
+    datasets: [
+      unprocessedDataVisible && {
+        label: "Pradiniai duomenys",
+        data: dataset.data,
+        fill: false,
+        backgroundColor: "rgb(0, 0, 0)",
+        borderColor: "rgba(0, 0, 0, 0.2)",
       },
-    ],
+      wmaVisible && {
+        label: "Slenkantis vidurkis su svoriais",
+        data: wma(dataset.data, K, L),
+        fill: false,
+        backgroundColor: "rgb(255, 0, 0)",
+        borderColor: "rgba(255, 0, 0, 0.5)",
+      },
+      emaVisible && {
+        label: "Eksponentinis slenkantis vidurkis",
+        data: ema(dataset.data, alfa),
+        fill: false,
+        backgroundColor: "rgb(25, 99, 132)",
+        borderColor: "rgba(25, 99, 132, 0.2)",
+      },
+    ].filter((x) => x),
   },
+  options: {
+    scales: {
+      yAxes: [
+        {
+          scaleLabel: {
+            display: true,
+            labelString: dataset.yAxisLabel,
+          },
+          ticks: {
+            beginAtZero: false,
+          },
+        },
+      ],
 
-  elements: {
-    line: {
-      tension: 0,
+      xAxes: [
+        {
+          scaleLabel: {
+            display: true,
+            labelString: dataset.xAxisLabel,
+          },
+        },
+      ],
+    },
+    elements: {
+      line: {
+        tension: 0,
+      },
     },
   },
-};
+});
 
 const App = () => {
   const [K, setK] = useState(5);
@@ -77,7 +91,9 @@ const App = () => {
   const [emaVisible, showEma] = useState(true);
   const [unprocessedDataVisible, showUnprocessedData] = useState(true);
 
-  const [dataSource, setDataSource] = useState(() => getPrimaryData);
+  const [dataSource, setDataSource] = useState(() =>
+    getChartData(getOzoneDataset())
+  );
 
   return (
     <div className="App">
@@ -119,7 +135,7 @@ const App = () => {
               value={alfa}
               onChange={({ target }) => setAlfa(parseFloat(target.value))}
               type={"number"}
-              inputProps={{ step: 0.01, min: 0, max: 1 }}
+              inputProps={{ step: 0.001, min: 0, max: 1 }}
             />
           </div>
         </FormControl>
@@ -158,20 +174,10 @@ const App = () => {
             />
           </FormGroup>
         </FormControl>
-
-        <div>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => setDataSource(() => getPrimaryData)}
-          >
-            Primary Data
-          </Button>
-        </div>
-      </div>
+</div>
       <div className="chart-container">
         <Line
-          data={dataSource({
+          {...dataSource({
             K,
             L,
             alfa,
@@ -179,10 +185,50 @@ const App = () => {
             emaVisible,
             unprocessedDataVisible,
           })}
-          options={options}
           redraw={false}
         />
       </div>
+
+      <div className='buttons-container'>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setDataSource(() => getChartData(getOzoneDataset()))}
+          >
+            Ozone, arosa, 1932-72 
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setDataSource(() => getChartData(getSunspotsDataset()))}
+          >
+            Zurich Sunspot Numbers 1749-1983 
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setDataSource(() => getChartData(getLondonTempDataset()))}
+          >
+            England temp 1723-1970
+          </Button>
+
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setDataSource(() => getChartData(getPhilPrecipDataset()))}
+          >
+            Philadelphia percip. 1820-1950
+          </Button>
+
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setDataSource(() => getChartData(getMaunaLoaCo2()))}
+          >
+            Mauna Loa CO2. 1958-2020
+          </Button>
+        </div>
+      
     </div>
   );
 };

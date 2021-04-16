@@ -27,16 +27,25 @@
     height: 600px;
     width: calc(100% - 100px);
     background-color: white;
-    margin-bottom: 500px;
+    margin-bottom: 230px;
 }
 
 .input-container {
     display: flex;
-    width: 500px;
+    width: 700px;
     justify-content: space-evenly;
     margin-bottom: 50px;
 }
 
 .field {
     width: 100px;
+}
+
+.buttons-container {
+    display: flex;
+    margin-bottom: 200px;
+}
+
+.buttons-container button {
+    margin-right: 20px;
 }

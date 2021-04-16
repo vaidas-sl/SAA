@@ -27,7 +27,7 @@ export const wma = (data: number[], K: number, L: number) => {
     .slice(K, data.length-K)
     .map((_, idx) => weightedSum(data.slice(idx, idx + 2*K + 1), weights));
 
-  return [...Array(K).fill(0), ...averagedData, ...Array(K).fill(0)];
+  return [...Array(K).fill(averagedData[0]), ...averagedData, ...Array(K).fill(averagedData[averagedData.length])];
 };
 
 // 0 <= alfa <= 1
