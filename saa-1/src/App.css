@@ -1,9 +1,6 @@
 .App {
     text-align: center;
-}
-
-.App-header {
-    background-color: #282c34;
+    background-color: white;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -11,14 +8,35 @@
     justify-content: center;
     font-size: calc(10px + 2vmin);
     color: white;
+    padding-top: 50px;
 }
 
 .App-link {
     color: #61dafb;
 }
 
+.form-label {
+    height: 40px;
+}
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+}
+
 .chart-container {
     height: 600px;
     width: 1200px;
     background-color: white;
+}
+
+.input-container {
+    display: flex;
+    width: 500px;
+    justify-content: space-evenly;
+    margin-bottom: 50px;
+}
+
+.field {
+    width: 100px;
 }
