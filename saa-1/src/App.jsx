@@ -1,76 +1,54 @@
 import React, { useState } from "react";
-import { TextField, Button, FormControl, FormLabel } from "@material-ui/core";
+import {
+  TextField,
+  Button,
+  FormControl,
+  FormLabel,
+  Switch,
+  FormControlLabel,
+  FormGroup,
+} from "@material-ui/core";
 
 import "./App.css";
 import { Line } from "react-chartjs-2";
 import { wma, ema } from "./averages.ts";
 
-const data = [
-  12,
-  19,
-  3,
-  5,
-  2,
-  3,
-  1,
-  2,
-  30,
-  30,
-  46,
-  7,
-  8,
-  5,
-  3,
-  2,
-  3,
-  4,
-  5,
-  6,
-  5,
-  4,
-  3,
-  3,
-  1,
-  1,
-  2,
-  7,
-  7,
-  5,
-  3,
-  5,
-  6,
-  8,
-  6,
-  3,
-  3,
-  1,
-];
+const data = Array(1000)
+  .fill(0)
+  .map((x) => Math.random() * 1000);
 
-const getPrimaryData = ({ K, L, alfa }) => ({
+const getPrimaryData = ({
+  K,
+  L,
+  alfa,
+  wmaVisible,
+  emaVisible,
+  unprocessedDataVisible,
+}) => ({
   labels: data.map((_, idx) => idx.toString()),
   datasets: [
-    {
+    unprocessedDataVisible && {
       label: "Pradiniai duomenys",
       data: data,
       fill: false,
       backgroundColor: "rgb(0, 0, 0)",
       borderColor: "rgba(0, 0, 0, 0.2)",
     },
-    {
+    wmaVisible && {
       label: "Slenkantis vidurkis su svoriais",
       data: wma(data, K, L),
       fill: false,
       backgroundColor: "rgb(255, 0, 0)",
       borderColor: "rgba(255, 0, 0, 0.5)",
     },
-    {
+    emaVisible && {
       label: "Eksponentinis slenkantis vidurkis",
       data: ema(data, alfa),
       fill: false,
       backgroundColor: "rgb(25, 99, 132)",
       borderColor: "rgba(25, 99, 132, 0.2)",
     },
-  ],
+  ].filter((x) => x),
 });
 
 const options = {
@@ -95,6 +73,9 @@ const App = () => {
   const [K, setK] = useState(5);
   const [L, setL] = useState(10);
   const [alfa, setAlfa] = useState(0.5);
+  const [wmaVisible, showWma] = useState(true);
+  const [emaVisible, showEma] = useState(true);
+  const [unprocessedDataVisible, showUnprocessedData] = useState(true);
 
   const [dataSource, setDataSource] = useState(() => getPrimaryData);
 
@@ -143,19 +124,61 @@ const App = () => {
           </div>
         </FormControl>
       </div>
-      
+
       <div className="input-container">
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => setDataSource(() => getPrimaryData)}
-        >
-          Primary Data
-        </Button>
+        <FormControl component="fieldset">
+          <FormLabel component="legend">Rodomi duomenys</FormLabel>
+          <FormGroup>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={unprocessedDataVisible}
+                  onChange={({ target }) => showUnprocessedData(target.checked)}
+                />
+              }
+              label="Pradiniai duomenys"
+            />
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={wmaVisible}
+                  onChange={({ target }) => showWma(target.checked)}
+                />
+              }
+              label="Slenkantis vidurkis su svoriais"
+            />
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={emaVisible}
+                  onChange={({ target }) => showEma(target.checked)}
+                />
+              }
+              label="Eksponentinis slenkantis vidurkis"
+            />
+          </FormGroup>
+        </FormControl>
+
+        <div>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setDataSource(() => getPrimaryData)}
+          >
+            Primary Data
+          </Button>
+        </div>
       </div>
       <div className="chart-container">
         <Line
-          data={dataSource({ K, L, alfa })}
+          data={dataSource({
+            K,
+            L,
+            alfa,
+            wmaVisible,
+            emaVisible,
+            unprocessedDataVisible,
+          })}
           options={options}
           redraw={false}
         />

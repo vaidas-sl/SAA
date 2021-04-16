@@ -11,7 +11,7 @@ export const ma = (data: number[], K: number) =>
     .map((_, idx) => sum(data.slice(idx, idx + K + 1)) / (2 * K + 1));
 
 const weightedSum = (data: number[], weights: number[]) =>
-  data.reduce((a, b, idx) => (a + b) * weights[idx], 0);
+  data.reduce((acc, val, idx) => acc + val * weights[idx], 0);
 
 // K > 1 ; L > 0
 export const wma = (data: number[], K: number, L: number) => {
@@ -24,14 +24,17 @@ export const wma = (data: number[], K: number, L: number) => {
   const weights = p_list.map((x) => x / sum(p_list));
 
   const averagedData = data
-    .slice(K, data.length - K + 1)
-    .map((_, idx) => weightedSum(data.slice(idx, idx + K + 1), weights));
+    .slice(K, data.length-K)
+    .map((_, idx) => weightedSum(data.slice(idx, idx + 2*K + 1), weights));
 
   return [...Array(K).fill(0), ...averagedData, ...Array(K).fill(0)];
 };
 
 // 0 <= alfa <= 1
-export const ema = (data: number[], alfa: number) => {
-  debugger
-  return data.slice(1).reduce((acc, value, idx) => [...acc, (1 - alfa) * acc[idx] + alfa*value], [data[0]]);
-}
+export const ema = (data: number[], alfa: number) =>
+  data
+    .slice(1)
+    .reduce(
+      (acc, value, idx) => [...acc, (1 - alfa) * acc[idx] + alfa * value],
+      [data[0]]
+    );

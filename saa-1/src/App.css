@@ -7,7 +7,6 @@
     align-items: center;
     justify-content: center;
     font-size: calc(10px + 2vmin);
-    color: white;
     padding-top: 50px;
 }
 
@@ -26,8 +25,9 @@
 
 .chart-container {
     height: 600px;
-    width: 1200px;
+    width: calc(100% - 100px);
     background-color: white;
+    margin-bottom: 500px;
 }
 
 .input-container {
